@@ -6,11 +6,11 @@ module Nutcracker
   module Graphite
 
     def self.start nutcracker, options
-      Agent.new(nutcracker,options).start
+      Agent.new(nutcracker, options).start
     end
 
     def self.version
-
+      Nutcracker::VERSION
     end
 
     class Agent
