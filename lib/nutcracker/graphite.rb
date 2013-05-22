@@ -74,26 +74,24 @@ module Nutcracker
           'keys'            => db_size,
           'max_memory'      => max_memory,
           'hit_ratio'       => 0
-        }.tap {|d|
-          d['hit_ratio'] = d['hits'].to_f / (d['hits']+d['misses']).to_f if d['hits'] > 0
-        }
+        }.tap {|d| d['hit_ratio'] = d['hits'].to_f / (d['hits']+d['misses']).to_f if d['hits'] > 0 }
       end
 
       private
 
       def parse stats
-        data = { :clusters => {} }
-        (stats.dup).each do |key, value|
-          (data[key] = value and next) if !value.is_a? Hash
-          data[:clusters][key] = value
-          data[:clusters][key][:nodes] = {}
-          data[:clusters][key].each do |key2,value2|
-            if value2.kind_of? Hash and key2.is_a? String
-              data[:clusters][key][:nodes][key2] = data[:clusters][key].delete(key2)
+        { :clusters => {} }.tap do |data|
+          (stats.dup).each do |key, value|
+            (data[key] = value and next) if !value.is_a? Hash
+            data[:clusters][key] = value
+            data[:clusters][key][:nodes] = {}
+            data[:clusters][key].each do |key2,value2|
+              if value2.kind_of? Hash and key2.is_a? String
+                data[:clusters][key][:nodes][key2] = data[:clusters][key].delete(key2)
+              end
             end
           end
         end
-        data
       end
 
     end
