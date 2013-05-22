@@ -27,7 +27,7 @@ module Nutcracker
       def start
         graphite.every(INTERVAL) do |client|
           escape = ->(s) { s.gsub(/\.|\:/,'_') }
-          data = parse(nutcracker.stats)
+          data = parse nutcracker.stats
           metrics = {}
           data[:clusters].each do |cluster, cluster_data|
             cluster_key = ['nutcracker',cluster,data['source']].map(&escape).join('.')
@@ -51,18 +51,18 @@ module Nutcracker
             end
 
           end
-          client.metrics(metrics)
+          client.metrics metrics
         end
       end
 
       def addional_data url
         url = "redis://#{url}" unless url =~ /redis\:\/\//
-        redis = Redis.connect(url: url)
+        redis = Redis.connect url: url
         server_info = redis.info
         db_size     = redis.dbsize
         max_memory  = redis.config(:get, 'maxmemory')['maxmemory'].to_i
         redis.quit
-        data = {
+        {
           'connections'     => server_info['connected_clients'].to_i,
           'used_memory'     => server_info['used_memory'].to_f,
           'used_memory_rss' => server_info['used_memory_rss'].to_f,
@@ -74,29 +74,23 @@ module Nutcracker
           'keys'            => db_size,
           'max_memory'      => max_memory,
           'hit_ratio'       => 0
+        }.tap {|d|
+          d['hit_ratio'] = d['hits'].to_f / (d['hits']+d['misses']).to_f if d['hits'] > 0
         }
-
-        data['hit_ratio'] = data['hits'].to_f / (data['hits']+data['misses']).to_f if data['hits'] > 0
-
-        data
       end
 
       private
 
       def parse stats
-        stats = stats.dup
         data = { :clusters => {} }
-        stats.each do |key, value|
-          if value.is_a? Hash and key.is_a? String
-            data[:clusters][key] = value
-            data[:clusters][key][:nodes] = {}
-            data[:clusters][key].each do |key2,value2|
-              if value2.kind_of? Hash and key2.is_a? String
-                data[:clusters][key][:nodes][key2] = data[:clusters][key].delete(key2)
-              end
+        (stats.dup).each do |key, value|
+          (data[key] = value and next) if !value.is_a? Hash
+          data[:clusters][key] = value
+          data[:clusters][key][:nodes] = {}
+          data[:clusters][key].each do |key2,value2|
+            if value2.kind_of? Hash and key2.is_a? String
+              data[:clusters][key][:nodes][key2] = data[:clusters][key].delete(key2)
             end
-          else
-            data[key] = value
           end
         end
         data
