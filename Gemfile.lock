@@ -1,0 +1,15 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    eventmachine (1.0.3)
+    graphite-api (0.1.0)
+      eventmachine (>= 0.3.3)
+      zscheduler (>= 0.0.3)
+    zscheduler (0.0.3)
+      eventmachine
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  graphite-api
