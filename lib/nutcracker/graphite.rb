@@ -63,23 +63,20 @@ module Nutcracker
         max_memory  = redis.config(:get, 'maxmemory')['maxmemory'].to_i
         redis.quit
         data = {
-          "connections"     => server_info['connected_clients'].to_i,
-          "used_memory"     => server_info['used_memory'].to_f,
-          "used_memory_rss" => server_info['used_memory_rss'].to_f,
-          "fragmentation"   => server_info['mem_fragmentation_ratio'].to_f,
-          "expired_keys"    => server_info['expired_keys'].to_i,
-          "evicted_keys"    => server_info['evicted_keys'].to_i,
-          "hits"            => server_info['keyspace_hits'].to_i,
-          "misses"          => server_info['keyspace_misses'].to_i,
-          "keys"            => db_size,
-          "max_memory"      => max_memory
+          'connections'     => server_info['connected_clients'].to_i,
+          'used_memory'     => server_info['used_memory'].to_f,
+          'used_memory_rss' => server_info['used_memory_rss'].to_f,
+          'fragmentation'   => server_info['mem_fragmentation_ratio'].to_f,
+          'expired_keys'    => server_info['expired_keys'].to_i,
+          'evicted_keys'    => server_info['evicted_keys'].to_i,
+          'hits'            => server_info['keyspace_hits'].to_i,
+          'misses'          => server_info['keyspace_misses'].to_i,
+          'keys'            => db_size,
+          'max_memory'      => max_memory,
+          'hit_ratio'       => 0
         }
 
-        data['hit_ratio'] = if data['hits'] > 0
-                              data['hits'].to_f / (data['hits']+data['misses']).to_f
-                            else
-                              0
-                            end
+        data['hit_ratio'] = data['hits'].to_f / (data['hits']+data['misses']).to_f if data['hits'] > 0
 
         data
       end
@@ -95,8 +92,7 @@ module Nutcracker
             data[:clusters][key][:nodes] = {}
             data[:clusters][key].each do |key2,value2|
               if value2.kind_of? Hash and key2.is_a? String
-                tmp = data[:clusters][key].delete(key2)
-                data[:clusters][key][:nodes][key2] = tmp
+                data[:clusters][key][:nodes][key2] = data[:clusters][key].delete(key2)
               end
             end
           else
