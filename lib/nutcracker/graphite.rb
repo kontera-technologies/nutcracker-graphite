@@ -16,43 +16,46 @@ module Nutcracker
     class Agent
       INTERVAL=60
 
-      attr_reader :nutcracker, :graphite, :options
+      attr_reader :nutcracker, :graphite
 
       def initialize nutcracker, options
         @nutcracker = nutcracker
-        @options = options
         @graphite = GraphiteAPI.new options.merge(:interval => INTERVAL)
       end
 
       def start
-        graphite.every(INTERVAL) do |client|
-          escape = ->(s) { s.gsub(/\.|\:/,'_') }
-          data = parse nutcracker.stats
-          metrics = {}
-          data[:clusters].each do |cluster, cluster_data|
-            cluster_key = ['nutcracker',cluster,data['source']].map(&escape).join('.')
-            cluster_data.each do |key, value|
-              if value.is_a? Fixnum or value.is_a? Float 
-                metrics["#{cluster_key}.#{key}"] = value 
-              end
-            end
-
-            cluster_data[:nodes].each do |node, node_data|
-              node_key = "#{cluster_key}.#{escape.(node)}"
-              node_data.each do |key,value|
-                if value.is_a? Fixnum or value.is_a? Float 
-                  metrics["#{node_key}.cluster_#{key}"] = value 
-                end
-
-                addional_data(node).each do |k,v|
-                  metrics["nutcreacker.redis.#{node.split(":").join('_')}.#{k}"] = v
-                end
-              end
-            end
-
-          end
-          client.metrics metrics
+        @task ||= graphite.every INTERVAL do |client|
+          client.metrics metrics parse nutcracker.stats
         end
+      end
+
+      def stop
+        @task and @task.cancel
+      end
+
+      private
+
+      def metrics parsed_stats
+        data = parsed_stats.clone
+        escape = ->(s) { s.gsub(/\.|\:/,'_') }
+        hash = {}
+        data[:clusters].each do |cluster, cluster_data|
+          cluster_key = ['nutcracker',cluster,data['source']].map(&escape).join('.')
+          cluster_data.each do |key, value|
+            hash[[cluster_key,key].join('.')] = value if value.is_a? Fixnum or value.is_a? Float
+          end
+
+          cluster_data[:nodes].each do |node, node_data|
+            node_key = "#{cluster_key}.#{escape.(node)}.cluster_"
+            node_key2 = "nutcreacker.redis.#{node.split(":").join('_')}"
+            node_data.each do |key, value|
+              hash[[node_key,key].join] = value if value.is_a? Fixnum or value.is_a? Float
+              addional_data(node).each {|k,v| hash[[node_key2,k].join('.')] = v }
+            end
+          end
+
+        end
+        hash
       end
 
       def addional_data url
@@ -77,7 +80,6 @@ module Nutcracker
         }.tap {|d| d['hit_ratio'] = d['hits'].to_f / (d['hits']+d['misses']).to_f if d['hits'] > 0 }
       end
 
-      private
 
       def parse stats
         { :clusters => {} }.tap do |data|
