@@ -27,7 +27,7 @@ module Nutcracker
         nutcracker.expects(:config).returns({'page_data_cluster' => {'redis' => true}})
         agent.expects(:redis_info).with('node1:6379').returns({'blabla' => 20})
 
-        expected = load_fixture('expected_metrics_wo_redis_info.ruby_hash').merge("nutcreacker.redis.node1_6379.blabla" => 20)
+        expected = load_fixture('expected_metrics_wo_redis_info.ruby_hash').merge("nutcracker.redis.node1_6379.blabla" => 20)
 
         assert_equal expected, agent.send(:metrics,load_fixture('expected_stats.ruby_hash'))
       end

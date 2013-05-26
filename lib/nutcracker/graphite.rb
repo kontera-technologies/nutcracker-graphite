@@ -9,10 +9,6 @@ module Nutcracker
       Agent.new(nutcracker, options).start
     end
 
-    def self.version
-      Nutcracker::Graphite::VERSION
-    end
-
     class Agent
       INTERVAL=60
 
@@ -27,6 +23,7 @@ module Nutcracker
         @task ||= graphite.every INTERVAL do |client|
           client.metrics metrics parse nutcracker.stats
         end
+        self
       end
 
       def stop
@@ -47,12 +44,11 @@ module Nutcracker
           end
 
           cluster_data[:nodes].each do |node, node_data|
-            node_key = "#{cluster_key}.#{escape.(node)}.cluster_"
-            node_key2 = "nutcreacker.redis.#{node.split(":").join('_')}"
+            node_key = "#{cluster_key}.#{escape.(node)}"
             node_data.each do |key, value|
-              hash[[node_key,key].join] = value if value.is_a? Fixnum or value.is_a? Float
+              hash["#{node_key}.cluster_#{key}"] = value if value.is_a? Fixnum or value.is_a? Float
             end
-            redis_info(node).each {|k,v| hash[[node_key2,k].join('.')] = v }
+            redis_info(node).each {|k,v| hash["#{node_key}.#{k}"] = v }
           end
 
         end

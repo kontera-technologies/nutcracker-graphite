@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'graphite-api', '~> 0.1.1'
   #s.add_runtime_dependency 'nutcracker',   '~> 0.2.4.3'
-  s.add_runtime_dependency 'nutcracker',   '0.2.4.beta1'
+  s.add_runtime_dependency 'nutcracker',   '0.2.4.beta2'
   s.add_runtime_dependency 'redis'
   
   s.add_development_dependency 'minitest', '~> 5.0.0'
