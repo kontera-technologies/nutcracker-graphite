@@ -10,7 +10,7 @@ module Nutcracker
     end
 
     def self.version
-      Nutcracker::VERSION
+      Nutcracker::Graphite::VERSION
     end
 
     class Agent
@@ -40,6 +40,7 @@ module Nutcracker
         escape = ->(s) { s.gsub(/\.|\:/,'_') }
         hash = {}
         data[:clusters].each do |cluster, cluster_data|
+          next unless ( nutcracker.config[cluster]["redis"] rescue false ) # skip memcached
           cluster_key = ['nutcracker',cluster,data['source']].map(&escape).join('.')
           cluster_data.each do |key, value|
             hash[[cluster_key,key].join('.')] = value if value.is_a? Fixnum or value.is_a? Float
@@ -50,15 +51,15 @@ module Nutcracker
             node_key2 = "nutcreacker.redis.#{node.split(":").join('_')}"
             node_data.each do |key, value|
               hash[[node_key,key].join] = value if value.is_a? Fixnum or value.is_a? Float
-              addional_data(node).each {|k,v| hash[[node_key2,k].join('.')] = v }
             end
+            redis_info(node).each {|k,v| hash[[node_key2,k].join('.')] = v }
           end
 
         end
         hash
       end
 
-      def addional_data url
+      def redis_info url
         url = "redis://#{url}" unless url =~ /redis\:\/\//
         redis = Redis.connect url: url
         server_info = redis.info
