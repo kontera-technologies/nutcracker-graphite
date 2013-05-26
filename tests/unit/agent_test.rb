@@ -40,7 +40,7 @@ module Nutcracker
         Redis.expects(:connect).with(url: 'redis://node1:6379').returns(redis)
         redis.expects(:info).returns(data['info'])
         redis.expects(:dbsize).returns(data['dbsize'])
-        redis.expects('config').with(:get,'maxmemory').returns(data['memory'])
+        redis.expects(:config).with(:get,'maxmemory').returns(data['memory'])
         redis.expects(:quit)
         assert_equal load_fixture('expected_redis_info.json'),
           agent.send(:redis_info,'node1:6379')
