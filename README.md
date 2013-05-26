@@ -34,7 +34,7 @@ require 'nutcracker'
 require 'nutcracker/graphite'
 
 # Start nutcracker
-nutcracker = Nutcracker.start(cluster: 'cluster.conf')
+nutcracker = Nutcracker.start(config_file: 'cluster.conf')
 
 # Start Graphite stats agent
 nutcracker.use(:graphite, graphite: 'graphite.example.com')
