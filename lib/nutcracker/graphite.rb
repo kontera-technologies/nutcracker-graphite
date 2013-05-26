@@ -37,7 +37,7 @@ module Nutcracker
         escape = ->(s) { s.gsub(/\.|\:/,'_') }
         hash = {}
         data[:clusters].each do |cluster, cluster_data|
-          next unless ( nutcracker.config[cluster]["redis"] rescue false ) # skip memcached
+          redis_cluster = ( nutcracker.config[cluster]["redis"] rescue false ) # skip memcached
           cluster_key = ['nutcracker',cluster,data['source']].map(&escape).join('.')
           cluster_data.each do |key, value|
             hash[[cluster_key,key].join('.')] = value if value.is_a? Fixnum or value.is_a? Float
@@ -48,7 +48,7 @@ module Nutcracker
             node_data.each do |key, value|
               hash["#{node_key}.cluster_#{key}"] = value if value.is_a? Fixnum or value.is_a? Float
             end
-            redis_info(node).each {|k,v| hash["#{node_key}.#{k}"] = v }
+            redis_info(node).each {|k,v| hash["#{node_key}.#{k}"] = v } if redis_cluster
           end
 
         end

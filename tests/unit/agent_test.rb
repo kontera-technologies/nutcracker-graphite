@@ -17,13 +17,16 @@ module Nutcracker
           agent.send(:parse,load_fixture('stats.json'))
       end
 
-      def test_metrics_generator
+      def test_metrics_generator_wo_redis_info
         nutcracker.expects(:config).returns({'page_data_cluster' => {'redis' => true}})
         agent.expects(:redis_info).with('node1:6379').returns({})
 
         assert_equal load_fixture('expected_metrics_wo_redis_info.ruby_hash') ,
           agent.send(:metrics,load_fixture('expected_stats.ruby_hash'))
 
+      end
+
+      def test_metrics_generator_with_redis_info
         nutcracker.expects(:config).returns({'page_data_cluster' => {'redis' => true}})
         agent.expects(:redis_info).with('node1:6379').returns({'blabla' => 20})
 
@@ -32,6 +35,13 @@ module Nutcracker
         )
 
         assert_equal expected, agent.send(:metrics,load_fixture('expected_stats.ruby_hash'))
+      end
+
+      def test_metrics_generator_on_non_redis_cluster
+        nutcracker.expects(:config).returns({})
+        agent.expects(:redis_info).never
+        assert_equal load_fixture('expected_metrics_wo_redis_info.ruby_hash'),
+          agent.send(:metrics,load_fixture('expected_stats.ruby_hash'))
       end
 
       def test_redis_info
