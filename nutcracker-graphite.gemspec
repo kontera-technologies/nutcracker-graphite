@@ -16,9 +16,8 @@ Gem::Specification.new do |s|
   s.require_path          = 'lib'
 
   s.add_runtime_dependency 'graphite-api', '~> 0.1.1'
-  #s.add_runtime_dependency 'nutcracker',   '~> 0.2.4.3'
+  #s.add_runtime_dependency 'nutcracker',   '~> 0.2.4.5'
   s.add_runtime_dependency 'nutcracker',   '0.2.4.beta3'
-  s.add_runtime_dependency 'redis'
   
   s.add_development_dependency 'minitest', '~> 5.0.0'
   s.add_development_dependency 'mocha',    '~> 0.14.0'
