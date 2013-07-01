@@ -4,8 +4,9 @@ Nutcracker Graphite
 
 [Nutcracker](https://github.com/kontera-technologies/nutcracker) plugin for sending cluster data to Graphite
 
-### DISCLAIMER
-this is still a work in progress...
+### Disclaimer
+this project is still in its early stages, so things could be a little buggy, if you find one, feel free to [report](https://github.com/kontera-technologies/nutcracker-graphite/issues) it.
+
 
 ## Dependencies
 - ruby 1.9+
@@ -100,3 +101,5 @@ nutcracker.<cluster-name>.<nutcracker-hostname>.<node2>.max_memory 21474836480.0
 nutcracker.<cluster-name>.<nutcracker-hostname>.<node2>.hit_ratio 0.96 1369569180
 ```
 
+### Warranty
+This software is provided “as is” and without any express or implied warranties, including, without limitation, the implied warranties of merchantability and fitness for a particular purpose.
