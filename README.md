@@ -5,7 +5,7 @@ Nutcracker Graphite
 [Nutcracker](https://github.com/kontera-technologies/nutcracker) plugin for sending cluster data to Graphite
 
 ### Disclaimer
-this project is still in its early stages, so things could be a little buggy, if you find one, feel free to [report](https://github.com/kontera-technologies/nutcracker-graphite/issues) it.
+this project is still in its early stages so things could be a little bit buggy, if you find one feel free to [report](https://github.com/kontera-technologies/nutcracker-graphite/issues) it.
 
 
 ## Dependencies
