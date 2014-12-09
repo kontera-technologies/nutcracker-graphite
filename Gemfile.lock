@@ -1,15 +1,15 @@
 PATH
   remote: .
   specs:
-    nutcracker-graphite (0.0.3)
+    nutcracker-graphite (0.0.4)
       graphite-api
-      nutcracker
+      nutcracker (>= 0.2.4.8)
 
 GEM
   remote: http://rubygems.org/
   specs:
     eventmachine (1.0.3)
-    graphite-api (0.1.3)
+    graphite-api (0.1.5)
       eventmachine (>= 0.3.3)
       zscheduler (>= 0.0.3)
     metaclass (0.0.1)
@@ -18,8 +18,8 @@ GEM
       metaclass (~> 0.0.1)
     nutcracker (0.3.0.12)
       redis
-    redis (3.0.7)
-    zscheduler (0.0.5)
+    redis (3.1.0)
+    zscheduler (0.0.6)
       eventmachine
 
 PLATFORMS
